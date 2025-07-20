@@ -490,7 +490,7 @@ add action=accept chain=input comment="Permitir Acesso Aplicação" dst-port=${e
             </h1>
           </div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4">
-            Configure sua rede completa: <strong>Rede básica + Firewall + Controle de conte��do + Acesso externo</strong>
+                        Configure sua rede completa: <strong>Rede básica + Firewall + Controle de conteúdo + Acesso externo</strong>
             <br />
             <em>Para qualquer provedor de internet!</em>
           </p>
