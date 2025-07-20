@@ -1455,6 +1455,46 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                           </div>
                         </CardContent>
                       )}
+                                        </Card>
+                  )}
+
+                  {/* Área de Cópia Manual */}
+                  {showManualCopy && generatedScript && (
+                    <Card className="border-2 border-orange-200 bg-orange-50">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2 text-orange-700">
+                            <Copy className="h-5 w-5" />
+                            📋 Cópia Manual - Script Limpo
+                          </CardTitle>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowManualCopy(false)}
+                            className="text-orange-700 hover:bg-orange-100"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <CardDescription className="text-orange-600">
+                          Selecione todo o texto abaixo (Ctrl+A) e copie (Ctrl+C) para usar no MikroTik
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Textarea
+                          value={removeCommentsFromScript(generatedScript)}
+                          readOnly
+                          className="h-64 font-mono text-sm border-orange-300 focus:border-orange-500"
+                          onClick={(e) => {
+                            const textarea = e.target as HTMLTextAreaElement;
+                            textarea.select();
+                            textarea.setSelectionRange(0, 99999);
+                          }}
+                        />
+                        <p className="text-sm text-orange-600 mt-2">
+                          💡 <strong>Dica:</strong> Clique na área de texto para selecioná-la automaticamente, depois pressione Ctrl+C
+                        </p>
+                      </CardContent>
                     </Card>
                   )}
 
@@ -1511,7 +1551,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                             <div>
                               <p className="font-medium">Pressione Enter</p>
                               <p className="text-sm text-gray-600">
-                                Configuração aplicada!
+                                Configuraç��o aplicada!
                               </p>
                             </div>
                           </div>
