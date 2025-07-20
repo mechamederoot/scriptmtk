@@ -330,6 +330,10 @@ add name=bridge-local
 
 # Adicionar apenas as portas LAN à bridge (não incluir a WAN)
 /interface bridge port
+${[2, 3, 4, 5]
+  .filter(port => port.toString() !== networkConfig.inPort)
+  .map(port => `add bridge=bridge-local interface=ether${port}`)
+  .join('\n')}
 
 # Configurar endereços IP
 /ip address
