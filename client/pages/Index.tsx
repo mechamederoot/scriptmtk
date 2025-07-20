@@ -430,7 +430,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
             : "")
         : "") +
       `
-# === CONFIGURAÇÃO FINALIZADA ===
+# === CONFIGURA��ÃO FINALIZADA ===
 # Provedor: ${networkConfig.providerName}
 # Configuração aplicada com sucesso!
 `;
@@ -501,7 +501,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
     });
   };
 
-  const copyToClipboard = async () => {
+    const copyToClipboard = async () => {
     const scriptWithoutComments = removeCommentsFromScript(generatedScript);
     try {
       // Tentar usar a API moderna do clipboard
@@ -512,6 +512,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
           description:
             "Script sem comentários copiado. Cole no terminal do MikroTik.",
         });
+        return;
       } else {
         // Fallback para navegadores antigos ou contextos não seguros
         const textArea = document.createElement("textarea");
@@ -519,9 +520,11 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
+        textArea.style.opacity = "0";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
+        textArea.setSelectionRange(0, 99999);
 
         const successful = document.execCommand("copy");
         document.body.removeChild(textArea);
@@ -532,17 +535,19 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
             description:
               "Script sem comentários copiado. Cole no terminal do MikroTik.",
           });
-        } else {
-          throw new Error("Falha ao copiar");
+          return;
         }
       }
     } catch (err) {
-      toast({
-        title: "❌ Erro ao copiar",
-        description: "Tente selecionar e copiar manualmente (Ctrl+C).",
-        variant: "destructive",
-      });
+      console.error("Erro ao copiar:", err);
     }
+
+    // Se chegou aqui, mostrar opção manual
+    setShowManualCopy(true);
+    toast({
+      title: "🔄 Cópia Manual Ativada",
+      description: "Use a área de texto abaixo para copiar o script manualmente.",
+    });
   };
 
   const downloadScript = () => {
