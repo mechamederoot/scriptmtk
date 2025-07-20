@@ -83,6 +83,7 @@ export default function Index() {
   const [terminalOutput, setTerminalOutput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [newAllowedSite, setNewAllowedSite] = useState("");
+  const [showManualCopy, setShowManualCopy] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
 
   const [networkConfig, setNetworkConfig] = useState<NetworkConfig>({
