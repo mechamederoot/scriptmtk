@@ -328,12 +328,8 @@ add action=drop chain=forward layer7-protocol=entretenimento
 /interface bridge
 add name=bridge-local
 
-# Adicionar todas as portas LAN à bridge
+# Adicionar apenas as portas LAN à bridge (não incluir a WAN)
 /interface bridge port
-add bridge=bridge-local interface=ether2
-add bridge=bridge-local interface=ether3
-add bridge=bridge-local interface=ether4
-add bridge=bridge-local interface=ether5
 
 # Configurar endereços IP
 /ip address
