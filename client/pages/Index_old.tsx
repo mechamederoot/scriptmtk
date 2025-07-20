@@ -146,12 +146,12 @@ export default function Index() {
   const generateContentBlockingRules = () => {
     let rules = "";
 
-    // Bloquear todos os sites
+        // Bloquear todos os sites
     if (contentBlocking.blockAllSites) {
       rules += `/ip firewall filter
-add action=accept chain=forward connection-state=established,related
 add action=drop chain=forward dst-port=80,443,8080 protocol=tcp
 add action=drop chain=forward dst-port=53 protocol=udp
+add action=accept chain=forward connection-state=established,related
 `;
       return rules;
     }
@@ -159,17 +159,16 @@ add action=drop chain=forward dst-port=53 protocol=udp
     // Permitir apenas sites específicos
     if (contentBlocking.allowOnlySpecific && contentBlocking.allowedSites.length > 0) {
       // Criar address-list com sites permitidos
-      contentBlocking.allowedSites.forEach((site) => {
+      contentBlocking.allowedSites.forEach((site, index) => {
         rules += `/ip firewall address-list
-add address=${site} list=sites-permitidos
+add address=${site} list=sites-permitidos comment="Site permitido ${index + 1}"
 `;
       });
       
       rules += `/ip firewall filter
-add action=accept chain=forward connection-state=established,related
-add action=accept chain=forward dst-address-list=sites-permitidos dst-port=80,443 protocol=tcp
-add action=drop chain=forward dst-port=80,443,8080 protocol=tcp
-add action=drop chain=forward dst-port=53 protocol=udp
+add action=accept chain=forward comment="Permitir sites específicos" dst-address-list=sites-permitidos dst-port=80,443 protocol=tcp
+add action=drop chain=forward comment="Bloquear todos os outros sites" dst-port=80,443,8080 protocol=tcp
+add action=drop chain=forward comment="Bloquear DNS não autorizado" dst-port=53 protocol=udp src-address-list=!sites-permitidos
 `;
       return rules;
     }
@@ -177,65 +176,65 @@ add action=drop chain=forward dst-port=53 protocol=udp
     // Bloqueios por categoria
     if (contentBlocking.blockCategories.social) {
       rules += `/ip firewall layer7-protocol
-add name=redes-sociais regexp="(facebook|instagram|twitter|tiktok|snapchat|linkedin|pinterest|reddit|discord|telegram|whatsapp)"
+add name=redes-sociais regexp="^.*(facebook|instagram|twitter|tiktok|snapchat|linkedin|pinterest|reddit|discord|telegram|whatsapp).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=redes-sociais
+add action=drop chain=forward comment="Bloquear Redes Sociais" layer7-protocol=redes-sociais
 `;
     }
 
     if (contentBlocking.blockCategories.gambling) {
       rules += `/ip firewall layer7-protocol
-add name=jogos-aposta regexp="(bet365|betfair|pokerstars|888poker|bwin|unibet|ladbrokes|williamhill|betway|casino|poker|bingo|slot)"
+add name=jogos-aposta regexp="^.*(bet365|betfair|pokerstars|888poker|bwin|unibet|ladbrokes|williamhill|betway|casino|poker|bingo|slot).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=jogos-aposta
+add action=drop chain=forward comment="Bloquear Jogos de Aposta" layer7-protocol=jogos-aposta
 `;
     }
 
     if (contentBlocking.blockCategories.adult) {
       rules += `/ip firewall layer7-protocol
-add name=conteudo-adulto regexp="(porn|xxx|sex|adult|erotic|nude|nsfw|xvideos|pornhub|redtube|xhamster|youporn)"
+add name=conteudo-adulto regexp="^.*(porn|xxx|sex|adult|erotic|nude|nsfw|xvideos|pornhub|redtube|xhamster|youporn).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=conteudo-adulto
+add action=drop chain=forward comment="Bloquear Conteúdo Adulto" layer7-protocol=conteudo-adulto
 `;
     }
 
     if (contentBlocking.blockCategories.gaming) {
       rules += `/ip firewall layer7-protocol
-add name=jogos-online regexp="(steam|epicgames|origin|uplay|battle\\.net|riotgames|minecraft|fortnite|pubg|valorant|csgo|dota)"
+add name=jogos-online regexp="^.*(steam|epicgames|origin|uplay|battle\\.net|riotgames|minecraft|fortnite|pubg|valorant|csgo|dota).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=jogos-online
+add action=drop chain=forward comment="Bloquear Jogos Online" layer7-protocol=jogos-online
 `;
     }
 
     if (contentBlocking.blockCategories.streaming) {
       rules += `/ip firewall layer7-protocol
-add name=streaming regexp="(netflix|youtube|spotify|twitch|amazon.*video|hulu|disney|globoplay|paramount|hbo)"
+add name=streaming regexp="^.*(netflix|youtube|spotify|twitch|amazon\\..*video|hulu|disney|globoplay|paramount|hbo).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=streaming
+add action=drop chain=forward comment="Bloquear Streaming" layer7-protocol=streaming
 `;
     }
 
     if (contentBlocking.blockCategories.shopping) {
       rules += `/ip firewall layer7-protocol
-add name=compras regexp="(amazon|mercadolivre|americanas|magazine|submarino|casasbahia|extra|shoptime|aliexpress|ebay)"
+add name=compras regexp="^.*(amazon|mercadolivre|americanas|magazine|submarino|casasbahia|extra|shoptime|aliexpress|ebay).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=compras
+add action=drop chain=forward comment="Bloquear Sites de Compras" layer7-protocol=compras
 `;
     }
 
     if (contentBlocking.blockCategories.news) {
       rules += `/ip firewall layer7-protocol
-add name=noticias regexp="(globo|uol|folha|estadao|g1|r7|band|sbt|record|cnn|bbc)"
+add name=noticias regexp="^.*(globo|uol|folha|estadao|g1|r7|band|sbt|record|cnn|bbc).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=noticias
+add action=drop chain=forward comment="Bloquear Sites de Notícias" layer7-protocol=noticias
 `;
     }
 
     if (contentBlocking.blockCategories.entertainment) {
       rules += `/ip firewall layer7-protocol
-add name=entretenimento regexp="(buzzfeed|9gag|imgur|memes|humor|diversao|entretenimento|cinema|tv|series)"
+add name=entretenimento regexp="^.*(buzzfeed|9gag|imgur|memes|humor|diversao|entretenimento|cinema|tv|series).*\\$"
 /ip firewall filter
-add action=drop chain=forward layer7-protocol=entretenimento
+add action=drop chain=forward comment="Bloquear Entretenimento" layer7-protocol=entretenimento
 `;
     }
 
@@ -253,7 +252,7 @@ add action=drop chain=forward layer7-protocol=entretenimento
 
 # Criar bridge para rede local
 /interface bridge
-add name=bridge-local
+add name=bridge-local comment="Bridge LAN - ${networkConfig.providerName}"
 
 # Adicionar todas as portas LAN à bridge
 /interface bridge port
@@ -268,7 +267,7 @@ add address=${networkConfig.networkBase}.1/24 interface=bridge-local network=${n
 
 # Configurar cliente DHCP na interface WAN
 /ip dhcp-client
-add interface=ether${networkConfig.inPort} disabled=no
+add interface=ether${networkConfig.inPort} disabled=no comment="${networkConfig.providerName}"
 
 # Configurar pool DHCP para rede local
 /ip pool
@@ -288,11 +287,11 @@ set allow-remote-requests=yes servers=8.8.8.8,1.1.1.1
 
 # Configurar NAT para acesso à internet
 /ip firewall nat
-add action=masquerade chain=srcnat out-interface=ether${networkConfig.inPort}
+add action=masquerade chain=srcnat out-interface=ether${networkConfig.inPort} comment="NAT ${networkConfig.providerName}"
 
 # Configurar rota padrão
 /ip route
-add distance=1 gateway=${networkConfig.ispGateway}
+add distance=1 gateway=${networkConfig.ispGateway} comment="Rota ${networkConfig.providerName}"
 
 ` + 
 
@@ -302,39 +301,39 @@ add distance=1 gateway=${networkConfig.ispGateway}
 
 (firewallRules.find(r => r.id === "block_winbox")?.enabled ? 
 `/ip firewall filter
-add action=drop chain=input dst-port=8291 in-interface=ether${networkConfig.inPort} protocol=tcp
+add action=drop chain=input comment="Bloquear WinBox Externo" dst-port=8291 in-interface=ether${networkConfig.inPort} protocol=tcp
 ` : '') +
 
 (firewallRules.find(r => r.id === "block_ssh")?.enabled ?
 `/ip firewall filter
-add action=drop chain=input dst-port=22 in-interface=ether${networkConfig.inPort} protocol=tcp
+add action=drop chain=input comment="Bloquear SSH Externo" dst-port=22 in-interface=ether${networkConfig.inPort} protocol=tcp
 ` : '') +
 
 (firewallRules.find(r => r.id === "block_telnet")?.enabled ?
 `/ip firewall filter
-add action=drop chain=input dst-port=23 protocol=tcp
+add action=drop chain=input comment="Bloquear Telnet" dst-port=23 protocol=tcp
 ` : '') +
 
 (firewallRules.find(r => r.id === "dos_protection")?.enabled ?
 `/ip firewall filter
-add action=drop chain=input connection-limit=10,32 protocol=tcp
-add action=drop chain=input connection-state=new limit=50,5:packet protocol=tcp tcp-flags=syn
+add action=drop chain=input comment="Proteção DDoS" connection-limit=10,32 protocol=tcp
+add action=drop chain=input comment="Proteção SYN Flood" connection-state=new limit=50,5:packet protocol=tcp tcp-flags=syn
 ` : '') +
 
 (firewallRules.find(r => r.id === "port_scan_detect")?.enabled ?
 `/ip firewall filter
-add action=add-src-to-address-list address-list=port-scanners address-list-timeout=1w chain=input protocol=tcp psd=21,3s,3,1
-add action=drop chain=input src-address-list=port-scanners
+add action=add-src-to-address-list address-list=port-scanners address-list-timeout=1w chain=input comment="Detectar Port Scan" protocol=tcp psd=21,3s,3,1
+add action=drop chain=input comment="Bloquear Port Scanners" src-address-list=port-scanners
 ` : '') +
 
 (firewallRules.find(r => r.id === "block_p2p")?.enabled ?
 `/ip firewall filter
-add action=drop chain=forward p2p=all-p2p
+add action=drop chain=forward comment="Bloquear P2P/Torrent" p2p=all-p2p
 ` : '') +
 
 (firewallRules.find(r => r.id === "limit_bandwidth")?.enabled ?
 `/queue simple
-add name=limite-geral target=${networkConfig.networkBase}.0/24 max-limit=50M/50M
+add name=limite-geral target=${networkConfig.networkBase}.0/24 max-limit=50M/50M comment="Limite ${networkConfig.providerName}"
 ` : '') +
 
 // Content Blocking Rules
@@ -348,12 +347,12 @@ add name=limite-geral target=${networkConfig.networkBase}.0/24 max-limit=50M/50M
 # === ACESSO EXTERNO ===
 # IP Público: ${externalAccess.publicIP || 'Configurar no provedor'}
 /ip firewall nat
-add action=dst-nat chain=dstnat dst-port=${externalAccess.applicationPort} in-interface=ether${networkConfig.inPort} protocol=tcp to-addresses=${networkConfig.networkBase}.10 to-ports=${externalAccess.applicationPort}
+add action=dst-nat chain=dstnat comment="Port Forwarding Aplicação" dst-port=${externalAccess.applicationPort} in-interface=ether${networkConfig.inPort} protocol=tcp to-addresses=${networkConfig.networkBase}.10 to-ports=${externalAccess.applicationPort}
 ` + 
 
 (externalAccess.firewallOpen ?
 `/ip firewall filter
-add action=accept chain=input dst-port=${externalAccess.applicationPort} in-interface=ether${networkConfig.inPort} protocol=tcp
+add action=accept chain=input comment="Permitir Acesso Aplicação" dst-port=${externalAccess.applicationPort} in-interface=ether${networkConfig.inPort} protocol=tcp
 ` : '') : '') +
 
 `
@@ -363,15 +362,6 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
 `;
 
     return script;
-  };
-
-  // Função para remover comentários do script
-  const removeCommentsFromScript = (script: string) => {
-    return script
-      .split('\n')
-      .filter(line => !line.trim().startsWith('#'))
-      .filter(line => line.trim() !== '')
-      .join('\n');
   };
 
   const scrollToBottom = () => {
@@ -429,19 +419,18 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
   };
 
   const copyToClipboard = async () => {
-    const scriptWithoutComments = removeCommentsFromScript(generatedScript);
     try {
       // Tentar usar a API moderna do clipboard
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(scriptWithoutComments);
+        await navigator.clipboard.writeText(generatedScript);
         toast({
           title: "📋 Script copiado!",
-          description: "Script sem comentários copiado. Cole no terminal do MikroTik.",
+          description: "Cole no terminal do MikroTik e pressione Enter.",
         });
       } else {
         // Fallback para navegadores antigos ou contextos não seguros
         const textArea = document.createElement("textarea");
-        textArea.value = scriptWithoutComments;
+        textArea.value = generatedScript;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
@@ -455,7 +444,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
         if (successful) {
           toast({
             title: "📋 Script copiado!",
-            description: "Script sem comentários copiado. Cole no terminal do MikroTik.",
+            description: "Cole no terminal do MikroTik e pressione Enter.",
           });
         } else {
           throw new Error('Falha ao copiar');
@@ -471,8 +460,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
   };
 
   const downloadScript = () => {
-    const scriptWithoutComments = removeCommentsFromScript(generatedScript);
-    const blob = new Blob([scriptWithoutComments], { type: 'text/plain' });
+    const blob = new Blob([generatedScript], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -483,7 +471,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
     URL.revokeObjectURL(url);
     toast({
       title: "💾 Arquivo baixado!",
-      description: `Script sem comentários salvo como: configuracao-${networkConfig.providerName.toLowerCase().replace(/\s+/g, '-')}-mikrotik.rsc`,
+      description: `Salvo como: configuracao-${networkConfig.providerName.toLowerCase().replace(/\s+/g, '-')}-mikrotik.rsc`,
     });
   };
 
@@ -503,7 +491,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
             </h1>
           </div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4">
-            Configure sua rede completa: <strong>Rede básica + Firewall + Controle de conteúdo + Acesso externo</strong>
+                        Configure sua rede completa: <strong>Rede básica + Firewall + Controle de conteúdo + Acesso externo</strong>
             <br />
             <em>Para qualquer provedor de internet!</em>
           </p>
@@ -526,7 +514,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
         {/* Tabs System */}
         <Card className="max-w-7xl mx-auto shadow-xl">
           <CardHeader className="bg-gradient-to-r from-mikrotik/10 via-network/10 to-purple-100">
-            <CardTitle className="text-2xl text-center">🔧 Configurador MikroTik</CardTitle>
+                        <CardTitle className="text-2xl text-center">🔧 Configurador MikroTik</CardTitle>
             <CardDescription className="text-center text-lg">
               Configure passo a passo sua rede completa
             </CardDescription>
@@ -1088,7 +1076,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                                   className="text-white hover:bg-gray-800"
                                 >
                                   <Copy className="h-4 w-4 mr-1" />
-                                  Copiar (Sem comentários)
+                                  Copiar
                                 </Button>
                                 <Button
                                   variant="ghost"
@@ -1097,7 +1085,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                                   className="text-white hover:bg-gray-800"
                                 >
                                   <Download className="h-4 w-4 mr-1" />
-                                  Download (Sem comentários)
+                                  Download
                                 </Button>
                               </>
                             )}
@@ -1167,7 +1155,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                             <div className="bg-network text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</div>
                             <div>
                               <p className="font-medium">Cole o Script</p>
-                              <p className="text-sm text-gray-600">Ctrl+V no terminal (script sem comentários)</p>
+                              <p className="text-sm text-gray-600">Ctrl+V no terminal</p>
                             </div>
                           </div>
                           <div className="flex items-start gap-3">
