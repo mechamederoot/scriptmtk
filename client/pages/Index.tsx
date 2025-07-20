@@ -513,7 +513,7 @@ add action=accept chain=input comment="Permitir Acesso Aplicação" dst-port=${e
         {/* Tabs System */}
         <Card className="max-w-7xl mx-auto shadow-xl">
           <CardHeader className="bg-gradient-to-r from-mikrotik/10 via-network/10 to-purple-100">
-            <CardTitle className="text-2xl text-center">🔧 Configurador Avançado</CardTitle>
+                        <CardTitle className="text-2xl text-center">🔧 Configurador MikroTik</CardTitle>
             <CardDescription className="text-center text-lg">
               Configure passo a passo sua rede completa
             </CardDescription>
