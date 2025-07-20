@@ -331,9 +331,9 @@ add name=bridge-local
 # Adicionar apenas as portas LAN à bridge (não incluir a WAN)
 /interface bridge port
 ${[2, 3, 4, 5]
-  .filter(port => port.toString() !== networkConfig.inPort)
-  .map(port => `add bridge=bridge-local interface=ether${port}`)
-  .join('\n')}
+  .filter((port) => port.toString() !== networkConfig.inPort)
+  .map((port) => `add bridge=bridge-local interface=ether${port}`)
+  .join("\n")}
 
 # Configurar endereços IP
 /ip address
@@ -501,7 +501,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
     });
   };
 
-    const copyToClipboard = async () => {
+  const copyToClipboard = async () => {
     const scriptWithoutComments = removeCommentsFromScript(generatedScript);
     try {
       // Tentar usar a API moderna do clipboard
@@ -546,7 +546,8 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
     setShowManualCopy(true);
     toast({
       title: "🔄 Cópia Manual Ativada",
-      description: "Use a área de texto abaixo para copiar o script manualmente.",
+      description:
+        "Use a área de texto abaixo para copiar o script manualmente.",
     });
   };
 
@@ -1455,7 +1456,7 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                           </div>
                         </CardContent>
                       )}
-                                        </Card>
+                    </Card>
                   )}
 
                   {/* Área de Cópia Manual */}
@@ -1477,7 +1478,8 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                           </Button>
                         </div>
                         <CardDescription className="text-orange-600">
-                          Selecione todo o texto abaixo (Ctrl+A) e copie (Ctrl+C) para usar no MikroTik
+                          Selecione todo o texto abaixo (Ctrl+A) e copie
+                          (Ctrl+C) para usar no MikroTik
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -1492,7 +1494,8 @@ add action=accept chain=input dst-port=${externalAccess.applicationPort} in-inte
                           }}
                         />
                         <p className="text-sm text-orange-600 mt-2">
-                          💡 <strong>Dica:</strong> Clique na área de texto para selecioná-la automaticamente, depois pressione Ctrl+C
+                          💡 <strong>Dica:</strong> Clique na área de texto para
+                          selecioná-la automaticamente, depois pressione Ctrl+C
                         </p>
                       </CardContent>
                     </Card>
