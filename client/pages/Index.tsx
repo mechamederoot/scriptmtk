@@ -146,11 +146,12 @@ export default function Index() {
   const generateContentBlockingRules = () => {
     let rules = "";
 
-    // Bloquear todos os sites
+        // Bloquear todos os sites
     if (contentBlocking.blockAllSites) {
       rules += `/ip firewall filter
-add action=drop chain=forward comment="Bloquear TODOS os sites" dst-port=80,443,8080 protocol=tcp
-add action=drop chain=forward comment="Bloquear DNS externo" dst-port=53 protocol=udp
+add action=drop chain=forward dst-port=80,443,8080 protocol=tcp
+add action=drop chain=forward dst-port=53 protocol=udp
+add action=accept chain=forward connection-state=established,related
 `;
       return rules;
     }
